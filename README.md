@@ -1,58 +1,82 @@
-# NodLink
+<p align="right"><b>English</b> · <a href="README.zh-CN.md">简体中文</a></p>
 
-**一副 AirPods，就是一只入耳式鼠标。**转头移动光标，歪头点击，开口说指令。不用摄像头，也不用额外佩戴任何东西。
+<p align="center"><img src="docs/screenshots/en/hero.jpg" width="100%" alt="NodLink"></p>
 
-[在线体验（用鼠标模拟头部）](https://gintmr.github.io/NodLink/) · [在 Mac 上安装](#安装)
+<h3 align="center">Your AirPods are already a mouse.</h3>
 
-> 下面的画面都是真人戴着 AirPods、手不碰键鼠录的。右下角是本人的动作（打了马赛克）。点图片可以放大。
+<p align="center">Turn your head to point. Tilt to click. Speak to command.<br>No camera, nothing extra to wear.</p>
 
-<p align="center"><img src="docs/gallery/console.gif" width="100%" alt="控制台：头部朝向实时驱动光标"></p>
-<p align="center"><b>控制台</b> · 头转到哪，光标就到哪</p>
+<p align="center">
+  <a href="https://gintmr.github.io/NodLink/"><b>Try it online</b></a> (mouse simulates your head)
+  &nbsp;·&nbsp;
+  <a href="#install"><b>Install on Mac</b></a>
+</p>
+
+## Screenshots
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/gallery/naiwa.gif" width="100%" alt="附身奶蛙"><br><b>附身奶蛙</b> · 你点头，它就笑；你转头，它出招</td>
-    <td width="50%"><img src="docs/gallery/popups.gif" width="100%" alt="关弹窗"><br><b>关弹窗</b> · 头指到按钮，说“点击”</td>
+    <td width="50%"><img src="docs/screenshots/en/console-first.jpg" width="100%" alt="First-person console"><br><b>First person</b> · your desk, your cursor</td>
+    <td width="50%"><img src="docs/screenshots/en/console-third.jpg" width="100%" alt="Third-person console"><br><b>Third person</b> · see where your head points</td>
   </tr>
   <tr>
-    <td><img src="docs/gallery/shorts.gif" width="100%" alt="刷短视频"><br><b>刷短视频</b> · 歪头下一条，说“双击”点赞</td>
-    <td><img src="docs/gallery/message.gif" width="100%" alt="回消息"><br><b>回消息</b> · 歪头按住说话，回正上屏</td>
+    <td><img src="docs/screenshots/en/turn-to-point.jpg" width="100%" alt="Turn to point"><br><b>Turn to point</b> · head angle maps straight to the screen</td>
+    <td><img src="docs/screenshots/en/sensors.jpg" width="100%" alt="Motion sensors"><br><b>Built-in sensors</b> · read 50 times a second</td>
   </tr>
   <tr>
-    <td><img src="docs/gallery/takeout.gif" width="100%" alt="点外卖"><br><b>点外卖</b> · 选菜、写备注、下单</td>
-    <td><img src="docs/gallery/douyin.gif" width="100%" alt="刷抖音"><br><b>刷抖音</b> · 真实网页版，歪头换下一条（他人作品已模糊）</td>
+    <td><img src="docs/screenshots/en/gestures.jpg" width="100%" alt="Gesture mappings"><br><b>One gesture, many mappings</b> · click, dictate, next video</td>
+    <td><img src="docs/screenshots/en/anywhere.jpg" width="100%" alt="Works lying down"><br><b>Lying down, lights off</b> · still works</td>
   </tr>
 </table>
 
-## 安装
+## In action
 
-需要：macOS 14 以上的 Mac，支持头部追踪的 AirPods（第 3 代及以后、Pro、Max），Node.js 18 以上。
+Recorded hands-free with real AirPods. The camera window (bottom right, face pixelated) shows the head movement.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/gallery/naiwa.gif" width="100%" alt="Naiwa"><br><b>Naiwa</b> · nod and it laughs, turn and it strikes a pose</td>
+    <td width="50%"><img src="docs/gallery/popups.gif" width="100%" alt="Close pop-ups"><br><b>Close pop-ups</b> · point, then say “click”</td>
+  </tr>
+  <tr>
+    <td><img src="docs/gallery/shorts.gif" width="100%" alt="Short videos"><br><b>Short videos</b> · tilt for next, say “double click” to like</td>
+    <td><img src="docs/gallery/message.gif" width="100%" alt="Reply to a message"><br><b>Reply</b> · tilt and hold to dictate, straighten to send</td>
+  </tr>
+  <tr>
+    <td><img src="docs/gallery/takeout.gif" width="100%" alt="Order food"><br><b>Order food</b> · pick, add a note, check out</td>
+    <td><img src="docs/gallery/douyin.gif" width="100%" alt="Real Douyin web"><br><b>Douyin (real site)</b> · tilt for the next video (content blurred)</td>
+  </tr>
+</table>
+
+## Install
+
+You need a Mac on macOS 14 or later, AirPods with head tracking (3rd gen or later, Pro, Max), and Node.js 18+.
 
 ```bash
-xcode-select --install                          # Xcode 命令行工具，装过会提示已安装
+xcode-select --install                          # command line tools; skip if already installed
 git clone https://github.com/gintmr/NodLink.git
-cd NodLink/web && npm install && npm start      # 控制台：http://localhost:8787
+cd NodLink/web && npm install && npm start      # console at http://localhost:8787
 ```
 
-另开一个终端，启动耳机桥：
+In a second terminal, start the AirPods bridge:
 
 ```bash
 cd NodLink/mac/NodLinkBridge && ./run.sh
 ```
 
-戴上 AirPods，打开 http://localhost:8787 ，按顶部引导走：连接耳机 → 定正前方 → 开始头控。第一次会请求运动与健身、辅助功能、麦克风、语音识别权限，都只在本机处理。随时按 **Esc** 交还鼠标。
+Put on your AirPods, open http://localhost:8787 and follow the guide at the top: connect AirPods → set straight ahead → start head control. macOS will ask for Motion & Fitness, Accessibility, Microphone and Speech Recognition access; everything stays on your Mac. Press **Esc** anytime to take the mouse back.
 
-## 怎么用
+## How to use
 
-| 动作 | 效果 |
+| Do this | Get this |
 |---|---|
-| 转头 | 移动光标 |
-| 左歪头再回正 / 右歪头再回正 | 单击 / 右键 |
-| 左歪头停住 | 按住拖拽 |
-| 说“点击”“双击”“上滑”…… | 语音指令，中英文都行 |
+| Turn your head | Move the cursor |
+| Tilt left and back / tilt right and back | Click / right-click |
+| Tilt left and hold | Press and drag |
+| Say “click”, “double click”, “scroll down”… | Voice commands (English or Chinese) |
 
-更多说明：[控制台](web/README.md) · [耳机桥](mac/NodLinkBridge/README.md)
+More: [console](web/README.md) · [AirPods bridge](mac/NodLinkBridge/README.md) (docs in Chinese)
 
-## 协议
+## License
 
-[MIT](LICENSE)。第三方 3D 模型为 CC0，见 [`web/public/models/README.md`](web/public/models/README.md)。AirPods、Mac 是 Apple Inc. 的商标，本项目与 Apple 无关。
+[MIT](LICENSE). Third-party 3D models are CC0, see [`web/public/models/README.md`](web/public/models/README.md). AirPods and Mac are trademarks of Apple Inc.; this project is not affiliated with Apple.

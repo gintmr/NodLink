@@ -113,6 +113,7 @@ const EN = {
   // 游戏厅
   '游戏': 'Games',
   '奶蛙': 'Naiwa',
+  '试一试': 'Try it',
   '传感器原始值 yaw {y} · pitch {p} · roll {r}（零点是耳机开始传数据时的朝向）': 'Raw sensor: yaw {y} · pitch {p} · roll {r} (zero = where the AirPods started streaming)',
   '点头': 'Nod',
   '抬头': 'Look up',
@@ -608,5 +609,10 @@ export function translateDom(root = document.body) {
   for (const el of root.querySelectorAll('[aria-label]')) {
     el.dataset.zhLabel ??= el.getAttribute('aria-label');
     if (HAN.test(el.dataset.zhLabel)) el.setAttribute('aria-label', t(el.dataset.zhLabel));
+  }
+  // 悬停提示（title）也一样：只换写死在页面里、能在词典里查到的中文
+  for (const el of root.querySelectorAll('[title]')) {
+    el.dataset.zhTitle ??= el.getAttribute('title');
+    if (HAN.test(el.dataset.zhTitle)) el.setAttribute('title', t(el.dataset.zhTitle));
   }
 }

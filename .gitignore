@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+
+# 编译产物
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# Node / web
+node_modules/
+dist/
+
+# 密钥
+.env
+*.local
+
+# 耳机桥日志
+bridge.log
+
+# 自己放进来的 3D 模型不提交（只提交内置的机器人、骑士、法师和书房素材）
+web/public/models/*
+!web/public/models/robot.glb
+!web/public/models/kaykit-knight.glb
+!web/public/models/kaykit-mage.glb
+!web/public/models/README.md
+!web/public/models/room/
+# 书房只用到了环境光贴图
+web/public/models/room/*
+!web/public/models/room/white_home_studio_1k.hdr
+
+# 介绍页可选的背景歌：版权不属于本项目，不提交（自己放一份到这里才会有声音）
+web/public/audio/intro-song.m4a

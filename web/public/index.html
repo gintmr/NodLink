@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    // 外观在“更多”里选；页面画出来之前就套上，免得先闪一下系统的颜色
+    // 公开体验版（GitHub Pages）由 scripts/build-public.js 在 <html> 上加 data-edition="public"：只用模拟数据，藏起要耳机桥的功能
+    try { const t = JSON.parse(localStorage.getItem('nodlink.theme')); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch {}
+  </script>
+  <title>NodLink</title>
+  <link rel="stylesheet" href="vendor/sora/index.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="challenge.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/examples/jsm/" } }
+  </script>
+</head>
+<body data-lens="show" class="covered">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M15 3.5 20.5 9l-3 1.5-3.5 3.5.5 4.5-2 2-4-4-4.5 4.5M8.5 12.5l-4-4 2-2 4.5.5 3.5-3.5z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18.5" cy="12" r="1.6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  </svg>
+
+  <!-- 介绍页（ui/cover.js）：往下滑是几章介绍，3D 的笔记本和 AirPods 钉在后面，跟着章节换镜头、关灯、躺下。
+       文字写死在这里，一打开就有；3D 是程序建模，不下载模型。看介绍的时候主场景在后面加载。
+       在任何一章点一下（或按回车）都进入控制台；一开始滑动，背景歌从“触不可及”那句开始放（ui/intro-song.js） -->
+  <section class="cover" id="cover" aria-label="NodLink">
+    <canvas aria-hidden="true"></canvas>
+    <div class="cover-top">
+      <button class="round music-btn" type="button" aria-label="音乐" aria-pressed="true" hidden><svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg></button>
+      <div class="pills" role="radiogroup" aria-label="语言" data-no-i18n>
+        <label><input type="radio" name="cover-lang" value="zh"><span>中</span></label>
+        <label><input type="radio" name="cover-lang" value="en"><span>EN</span></label>
+      </div>
+      <button class="round theme-btn" type="button" aria-label="切换深浅色"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z"/></svg></button>
+    </div>
+    <nav class="cover-nav" aria-label="章节"></nav>
+    <p class="flow-bubble" aria-hidden="true"><span>双击</span></p>
+    <button class="cover-music" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span>点这里放音乐</span></button>
+
+    <div class="cover-scroll">
+      <article class="ch ch-hero" data-label="开场">
+        <div class="cover-copy">
+          <p class="cover-logo" data-no-i18n>NodLink</p>
+          <h1><span>触不可及，</span><span>又何必在意</span></h1>
+          <p class="cover-cite">周深《触不可及》</p>
+        </div>
+        <div class="cover-foot">
+          <p class="cover-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg><span>往下滑，看它怎么工作</span></p>
+          <p class="cover-hint quiet">点任意处开始</p>
+        </div>
+      </article>
+
+      <article class="ch ch-flow" data-label="流程">
+        <!-- 四段分镜各一句说明，脚本按时间亮起当前这一段（ui/cover.js） -->
+        <ol class="flow-caps">
+          <li><b>实时读取头部朝向</b><span>AirPods 经蓝牙每秒传来 50 次姿态数据</span></li>
+          <li><b>转头即指向</b><span>校准后，头部角度直接换算成屏幕坐标</span></li>
+          <li><b>歪头即点击</b><span>向左歪头再回正，在光标处单击</span></li>
+          <li><b>开口即指令</b><span>说出“双击”，就在光标处双击</span></li>
+        </ol>
+      </article>
+
+      <article class="ch" data-label="传感器">
+        <div class="ch-text">
+          <h2>你早就戴着鼠标了。</h2>
+          <p>AirPods 里装着陀螺仪和加速度计，本来服务于空间音频：你转头时，声音仍停在原处。NodLink 每秒读取 50 次头部朝向，用它移动光标。</p>
+          <dl class="axes">
+            <div data-axis="yaw"><dt>左右转头</dt><dd>光标左右移动</dd></div>
+            <div data-axis="pitch"><dt>抬头低头</dt><dd>光标上下移动</dd></div>
+            <div data-axis="roll"><dt>左右歪头</dt><dd>点击鼠标</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="ch" data-label="指向">
+        <div class="ch-text">
+          <h2>转首为指。</h2>
+          <p>使用前做一次简单的定点校准，之后即可使用。</p>
+        </div>
+      </article>
+
+      <article class="ch" data-label="映射">
+        <div class="ch-text">
+          <h2>一个动作，多种映射。</h2>
+          <p>歪头的用途随场景切换，开口还能直接说出快捷键。</p>
+          <dl class="moves">
+            <div><dt>向左歪头</dt><dd><span>单击</span><span>按住 Fn 语音输入</span><span>下一条视频</span></dd></div>
+            <div><dt>向右歪头</dt><dd><span>右键</span><span>回车</span><span>打开评论区</span></dd></div>
+            <div><dt>左歪停住</dt><dd><span>按住左键，转头拖拽</span></dd></div>
+            <div><dt>说“复制”“撤销”</dt><dd><span>⌘C</span><span>⌘Z</span></dd></div>
+            <div><dt>说“command tab”</dt><dd><span>任意组合键</span></dd></div>
+            <div><dt>说“标号”，再说数字</dt><dd><span>点中对应的按钮</span></dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="ch ch-night" data-label="随处">
+        <div class="ch-text">
+          <h2>躺着，侧着，<br>关了灯，都行。</h2>
+          <p>摄像头式的头部追踪需要光线，也需要你正对屏幕。NodLink 只读取 AirPods 里的传感器，全程不开摄像头。</p>
+          <p class="care"><span>它为卧床的人和双手不便的人而做，也适合想腾出双手的你。</span></p>
+        </div>
+      </article>
+
+      <article class="ch" data-label="设备">
+        <div class="ch-text">
+          <h2><span>今天在 Mac，</span><span>下一步是 iPhone。</span></h2>
+          <p>在 Mac 上，NodLink 直接移动系统光标，不需要额外硬件。</p>
+          <p>iPhone 和 iPad 不接受远程操控，这部分可能会引入 ESP32 之类的外部控制器来调试。</p>
+          <ul class="devices">
+            <li class="ready"><b>Mac</b><span>现在可用</span></li>
+            <li><b>iPhone · iPad</b><span>正在进行中</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="ch ch-end" data-label="开始">
+        <div class="cover-copy">
+          <h2>戴上耳机，开始吧。</h2>
+          <ul class="cover-feats">
+            <li>单击</li><li>双击</li><li>右键</li><li>长按拖拽</li><li>滚动缩放</li><li>空格回车</li><li>键盘快捷键</li><li>语音指令</li><li>多屏切换</li>
+          </ul>
+          <button class="cover-enter" type="button">进入控制台<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- 主角：铺满窗口的 3D 场景。标签、探针、展开卡片都画在它上面 -->
+  <main class="stage" id="viewport">
+    <div class="scene" id="scene"></div>
+    <div class="layer" id="layer" aria-live="polite">
+      <svg class="leader" id="leader" aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0"/><circle r="4"/></svg>
+    </div>
+  </main>
+
+  <!-- 浏览器全屏校准时才会出现的画布（没有耳机桥时的退路） -->
+  <div class="stage-wrap" id="stage-wrap"><canvas id="stage"></canvas></div>
+
+  <header class="top">
+    <div class="top-start">
+      <span class="wordmark" data-no-i18n>NodLink</span>
+      <div class="pills" role="radiogroup" aria-label="视角">
+        <label><input type="radio" name="view" value="first" checked><span>第一人称</span></label>
+        <label><input type="radio" name="view" value="third"><span>第三人称</span></label>
+      </div>
+      <button class="pods-chip arcade-entry" id="btn-arcade" type="button" title="游戏" aria-label="游戏"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 9.5v4M5.5 11.5h4M15 11h.01M17.5 13.5h.01"/><path d="M8 6.5h8a5 5 0 0 1 4.9 6l-.7 3.4a2.4 2.4 0 0 1-4.2 1L14.5 15h-5L8 16.9a2.4 2.4 0 0 1-4.2-1l-.7-3.4A5 5 0 0 1 8 6.5Z"/></svg><span>游戏</span></button>
+      <button class="pods-chip arcade-entry" id="btn-challenge" type="button" title="试一试" aria-label="试一试"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0Z"/><path d="M8 6H5.5a2.5 2.5 0 0 0 2.6 3.4M16 6h2.5a2.5 2.5 0 0 1-2.6 3.4M12 13v4M8.5 20h7M10 17h4"/></svg><span>试一试</span></button>
+      <button class="pods-chip arcade-entry" id="btn-naiwa" type="button" title="奶蛙" aria-label="奶蛙"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20.5c-.6-2.2-.9-4.4-.9-6.4C5.1 8.3 8 4 12 4s6.9 4.3 6.9 10.1c0 2-.3 4.2-.9 6.4"/><circle cx="9.3" cy="9.6" r="1.4"/><circle cx="14.7" cy="9.6" r="1.4"/><path d="M9.6 13.2c1.4 1.1 3.4 1.1 4.8 0"/></svg><span>奶蛙</span></button>
+    </div>
+
+    <!-- 时间轴：唯一常驻的界面，收成顶栏中间的一枚胶囊 -->
+    <div class="timeline">
+      <button class="live-btn" id="btn-live" aria-pressed="true">实时</button>
+      <div class="tl-track">
+        <canvas id="timeline" aria-label="时间轴：拖动回到过去的某一刻"></canvas>
+        <span class="tl-tip" id="tl-tip" hidden></span>
+      </div>
+      <span class="tl-time" id="tl-time">现在</span>
+    </div>
+
+    <div class="top-end">
+      <!-- 顶栏只留耳机状态一个胶囊：点它打开 AirPods 卡片，最上面就是数据源（模拟 / 耳机）；校准收在“更多”里 -->
+      <!-- 设置入口：每一类一个按钮，点一下打开这一类的全部设置。3D 里点部件、引导条、胶囊上的按钮也只是打开这几个面板之一 -->
+      <!-- 只在公开体验版出现：指向仓库的安装说明 -->
+      <a class="pods-chip public-only" id="edition-link" href="https://github.com/gintmr/NodLink#readme" target="_blank" rel="noopener"><span>用真耳机</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+      <button class="pods-chip" id="pods-chip" type="button" data-panel="pods" aria-pressed="false"><span class="dot" aria-hidden="true"></span><span id="pods-chip-text"></span></button>
+      <div class="panel-tabs" role="group" aria-label="设置">
+        <button type="button" data-panel="calib" aria-pressed="false">校准</button>
+        <button type="button" data-panel="cursor" aria-pressed="false">光标</button>
+        <button type="button" data-panel="actions" aria-pressed="false">操作</button>
+      </div>
+      <button class="round" id="btn-menu" aria-label="更多" aria-expanded="false"><svg><use href="#i-more"/></svg></button>
+      <!-- 语言和深浅放在最右边：封面右上角是同样的两个按钮、同一个位置 -->
+      <div class="pills" role="radiogroup" aria-label="语言" data-no-i18n>
+        <label><input type="radio" name="lang" value="zh"><span>中</span></label>
+        <label><input type="radio" name="lang" value="en"><span>EN</span></label>
+      </div>
+      <button class="round theme-btn" id="btn-theme" type="button" aria-label="切换深浅色"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1Z"/></svg></button>
+    </div>
+  </header>
+
+  <!-- 新手引导：连接耳机 → 定正前方 → 开始头控。当前这一步高亮，做完的打勾；点哪一步就去做那一步 -->
+  <nav class="first-hint guide live-only" id="first-hint" aria-label="开始使用">
+    <button type="button" data-step="pods"><i aria-hidden="true">1</i><span>连接耳机</span></button>
+    <span class="guide-sep" aria-hidden="true"></span>
+    <button type="button" data-step="center"><i aria-hidden="true">2</i><span>定正前方</span></button>
+    <span class="guide-sep" aria-hidden="true"></span>
+    <button type="button" data-step="control"><i aria-hidden="true">3</i><span>开始头控</span></button>
+  </nav>
+  <!-- 正在指向：头指的那个点下面是什么（耳机桥用辅助功能读出来） -->
+  <div class="pointing" id="pointing" hidden><span class="pointing-app"></span><b class="pointing-what"></b></div>
+  <div class="ctl-pill live-only" id="ctl-pill" role="status" aria-live="polite"><span class="ctl-dot" aria-hidden="true"></span><span class="run-text"><b id="ctl-text"></b><small id="ctl-sub"></small></span><button class="btn soft" id="ctl-settings" type="button">设置</button><button class="btn" id="ctl-stop" type="button">交还 · Esc</button></div>
+  <div class="run-pill" id="run-pill" role="status" aria-live="polite">
+    <span class="run-dot" aria-hidden="true"></span>
+    <span class="run-text"><b id="run-text"></b><small id="run-where"></small></span>
+    <span class="run-bar" aria-hidden="true"><i id="run-bar"></i></span>
+    <button class="btn" id="run-stop" type="button">停止 · Esc</button>
+  </div>
+
+  <!-- 点部件后在它旁边展开的卡片 -->
+
+  <section class="callout" data-part="pods" hidden>
+    <header><h2>耳机</h2><button class="x" aria-label="关闭"><svg><use href="#i-close"/></svg></button></header>
+    <label class="row live-only"><span>数据源</span><span class="pills" role="radiogroup" aria-label="数据源">
+      <label><input type="radio" name="source" value="sim" checked><span>模拟</span></label>
+      <label><input type="radio" name="source" value="live"><span>耳机</span></label>
+    </span></label>
+    <p class="state" id="pods-state">–</p>
+    <div class="numbers">
+      <div><b id="st-yaw">–</b><span>yaw</span></div>
+      <div><b id="st-pitch">–</b><span>pitch</span></div>
+      <div><b id="st-roll">–</b><span>roll</span></div>
+    </div>
+    <p class="note" id="pods-raw"></p>
+    <p class="note" id="pods-note"></p>
+    <ul class="checks" id="pods-checks"></ul>
+    <div class="actions live-only">
+      <button class="btn ink" id="btn-pods-restart">重新连接耳机数据</button>
+      <button class="btn soft" id="btn-open-sound">声音输出</button>
+      <button class="btn soft" id="btn-open-bt">蓝牙设置</button>
+    </div>
+    <label class="row switch-row live-only"><span>播放静音，保持耳机数据</span><input type="checkbox" class="switch" id="c-silent"></label>
+    <p class="note live-only">没有声音在播放时，系统有时会停掉头部姿态。打开后耳机桥一直播放一段静音，听不到。</p>
+    <h3>头部朝向</h3>
+    <p class="state" id="head-state">–</p>
+    <div class="numbers two">
+      <div><b id="st-rel-h">–</b><span>水平，向右为正</span></div>
+      <div><b id="st-rel-v">–</b><span>垂直，向上为正</span></div>
+    </div>
+    <h3>轴方向</h3>
+    <p class="note">跟着提示依次向右转头、抬头、向右歪头，自动认出哪个轴是水平、哪个是垂直，以及歪头方向。约 16 秒。</p>
+    <div class="actions"><button class="btn soft" id="btn-axes">识别轴方向</button></div>
+    <div class="result" id="axes-result"></div>
+    <label class="row"><span>水平角</span><span class="field"><select id="axis-h"><option>yaw</option><option>pitch</option><option>roll</option></select><label class="inv"><input id="inv-h" type="checkbox" checked>反转</label></span></label>
+    <label class="row"><span>垂直角</span><span class="field"><select id="axis-v"><option>yaw</option><option selected>pitch</option><option>roll</option></select><label class="inv"><input id="inv-v" type="checkbox">反转</label></span></label>
+    <label class="row"><span>歪头</span><span class="field"><output id="axis-r-name">roll</output><label class="inv"><input id="inv-r" type="checkbox">反转</label></span></label>
+    <div class="pins">
+      <button data-pin="pods:rate"><svg><use href="#i-pin"/></svg>采样率</button>
+      <button data-pin="pods:yaw"><svg><use href="#i-pin"/></svg>yaw</button>
+      <button data-pin="pods:pitch"><svg><use href="#i-pin"/></svg>pitch</button>
+      <button data-pin="pods:roll"><svg><use href="#i-pin"/></svg>roll</button>
+      <button data-pin="head:h"><svg><use href="#i-pin"/></svg>水平角</button>
+      <button data-pin="head:v"><svg><use href="#i-pin"/></svg>垂直角</button>
+      <button data-pin="head:wave"><svg><use href="#i-pin"/></svg>朝向波形</button>
+    </div>
+  </section>
+  <section class="callout" data-part="calib" hidden>
+    <header><h2>校准</h2><button class="x" aria-label="关闭"><svg><use href="#i-close"/></svg></button></header>
+    <p class="state" id="calib-state">–</p>
+    <ol class="steps">
+      <li>
+        <div><b>中心校准</b><span>用鼻尖对准主显示器正中的点，保持 2 秒，定下“正前方”。戴上耳机先做这一步；偏了也可以说“回中”或按 C。</span></div>
+        <button class="btn ink" id="btn-center">中心校准</button>
+        <div class="result" id="center-result"></div>
+      </li>
+      <li>
+        <div><b>多屏定点</b><span>有几块显示器就依次对准每块的中心，算出它们相对你的位置。只有一块屏可以跳过。</span></div>
+        <button class="btn soft" id="btn-centers">多屏定点</button>
+        <div class="result" id="centers-result"></div>
+      </li>
+      <li>
+        <div><b>路径校准<small>可选，更准</small></b><span>约 30 秒：先看中心和四个角，再用鼻尖跟着光标沿四边走两圈。</span></div>
+        <button class="btn soft" id="btn-cal">路径校准</button>
+        <div class="result" id="cal-result"></div>
+        <figure id="lag-figure" hidden><canvas id="lag-chart"></canvas><figcaption>拟合误差随延迟变化，最低点就是你跟上目标需要的时间</figcaption></figure>
+      </li>
+    </ol>
+    <label class="row"><span>路径校准用</span><select id="model-kind"><option value="affine">仿射</option><option value="quadratic">二次</option></select></label>
+    <label class="row"><span>头到屏幕的距离</span><span class="field"><input id="set-dist" type="number" value="3000" min="200" step="100"><em>px</em></span></label>
+    <h3>指向线</h3>
+    <p class="state" id="ray-state">–</p>
+    <p class="note">紫色的线是头部朝向的延长线，它落在哪块屏幕上，光标就该在哪。校准就是让两者对上。</p>
+    <h3 id="screen-title">准度测试</h3>
+    <p class="state" id="screen-state">–</p>
+    <p class="note">在选中的显示器（没选就是主显示器）上依次出现 9 个目标，用鼻尖对准，测光标离目标有多远、抖得多厉害。</p>
+    <div class="actions">
+      <button class="btn ink" id="btn-grid">测一测准不准</button>
+    </div>
+    <div class="result" id="grid-result"></div>
+    <label class="row"><span>轮数</span><span class="field"><input id="grid-rounds" type="number" value="1" min="1" max="5"><em>轮</em></span></label>
+    <label class="row"><span>点击时修正漂移</span><input type="checkbox" class="switch" id="grid-correct"></label>
+    <label class="row"><span>修正力度</span><span class="field"><input id="grid-gain" type="number" value="0.5" min="0" max="1" step="0.1"></span></label>
+    <div class="pins">
+      <button data-pin="ray:error"><svg><use href="#i-pin"/></svg>落点误差</button>
+    </div>
+  </section>
+  <section class="callout" data-part="cursor" hidden>
+    <header><h2>光标</h2><button class="x" aria-label="关闭"><svg><use href="#i-close"/></svg></button></header>
+    <div class="pills block" role="radiogroup" aria-label="光标模式">
+      <label><input type="radio" name="cursor-mode" value="absolute" checked><span>绝对</span></label>
+      <label><input type="radio" name="cursor-mode" value="delta"><span>增量</span></label>
+      <label><input type="radio" name="cursor-mode" value="relative"><span>摇杆</span></label>
+    </div>
+    <p class="note" id="mode-hint"></p>
+    <div class="gain">
+      <div><span>灵敏度</span><output id="f-gain-val">1.00×</output></div>
+      <input id="f-gain" type="range" min="0.2" max="1.5" step="0.05" value="1" aria-label="灵敏度">
+      <div class="scale"><span>慢</span><span>快</span></div>
+    </div>
+    <label class="row switch-row"><span>精细模式（头慢慢动时光标走得少）</span><input type="checkbox" class="switch" id="f-precise" checked></label>
+    <label class="row switch-row"><span>自动纠正左右漂移</span><input type="checkbox" class="switch" id="c-drift" checked></label>
+    <p class="note" id="drift-state">耳机的水平角会慢慢漂。偏了说“回中”或按 C：先看着屏幕中间再说。</p>
+    <h3>滤波和摇杆</h3>
+    <div id="abs-opts">
+      <label class="row"><span>滤波最小截止</span><span class="field"><input id="f-min" type="number" value="1" min="0.05" step="0.1"><em>Hz</em></span></label>
+      <label class="row"><span>速度系数 β</span><span class="field"><input id="f-beta" type="number" value="0.01" min="0" step="0.002"></span></label>
+    </div>
+    <div id="rel-opts" hidden>
+      <label class="row"><span>死区</span><span class="field"><input id="r-dead" type="number" value="1.5" min="0" step="0.5"><em>°</em></span></label>
+      <label class="row"><span>速度</span><span class="field"><input id="r-gain" type="number" value="60" min="1" step="5"></span></label>
+      <label class="row"><span>指数</span><span class="field"><input id="r-expo" type="number" value="1.5" min="1" max="3" step="0.1"></span></label>
+    </div>
+    <div class="actions">
+      <button class="btn soft" id="btn-recenter">重新居中 <kbd>C</kbd></button>
+      <button class="btn soft" id="btn-clutch">离合 <kbd>空格</kbd></button>
+    </div>
+    <div class="pins">
+      <button data-pin="cursor:pos"><svg><use href="#i-pin"/></svg>位置</button>
+      <button data-pin="cursor:wave"><svg><use href="#i-pin"/></svg>滤波前后</button>
+    </div>
+  </section>
+  <section class="callout" data-part="actions" hidden>
+    <header><h2>操作</h2><button class="x" aria-label="关闭"><svg><use href="#i-close"/></svg></button></header>
+    <label class="row switch-row live-only"><span>接管这台电脑的鼠标</span><input type="checkbox" class="switch" id="ctl"></label>
+    <p class="note live-only" id="ctl-hint"></p>
+    <label class="row switch-row"><span>点击时对准按钮</span><input type="checkbox" class="switch" id="c-snap" checked></label>
+    <label class="row switch-row"><span>歪头手势</span><input type="checkbox" class="switch" id="c-tilt" checked></label>
+    <label class="row"><span>歪头用来</span><select id="c-tilt-mode"><option value="click">点击：左歪单击，右歪右键</option><option value="dictate">语音输入：左歪按住 Fn，右歪回车</option><option value="douyin">抖音：左歪下一条，右歪评论区</option></select></label>
+    <!-- 当前场景下每个动作做什么：选歪头场景、开关语音时由 app.js 的 renderTiltLegend() 重写 -->
+    <dl class="tilt-legend" id="tilt-legend"></dl>
+    <label class="row switch-row"><span>驻留点击</span><input type="checkbox" class="switch" id="c-dwell"></label>
+    <label class="row switch-row live-only"><span>语音指令</span><input type="checkbox" class="switch" id="c-voice"></label>
+    <label class="row live-only"><span>麦克风</span><select id="c-mic"><option value="builtin">Mac 自带（耳机音质不变）</option><option value="default">系统默认输入</option></select></label>
+    <label class="row switch-row"><span>提示音（从耳机里出来）</span><input type="checkbox" class="switch" id="c-sound" checked></label>
+    <label class="row"><span>歪多少度算数</span><span class="field"><input id="c-enter" type="number" value="12" min="6" max="30" step="1"><em>°</em></span></label>
+    <label class="row"><span>驻留多久点击</span><span class="field"><input id="c-dwell-ms" type="number" value="800" min="300" max="3000" step="100"><em>ms</em></span></label>
+    <label class="row"><span>键鼠停手多久后恢复</span><span class="field"><input id="c-yield" type="number" value="1.5" min="0.3" max="10" step="0.1"><em>秒</em></span></label>
+    <p class="note">慢慢歪过去、边转头边歪、头在快速转动时都不算，侧躺也能用。模拟数据时按住 <kbd>[</kbd> <kbd>]</kbd> 歪头。</p>
+  </section>
+
+  <!-- 更多：全局设置 -->
+  <section class="sheet" id="menu" hidden>
+    <header><h2>更多</h2><button class="x" aria-label="关闭"><svg><use href="#i-close"/></svg></button></header>
+    <button class="row link" id="btn-home">回到默认视角</button>
+    <label class="row"><span>屏幕</span><select id="stage-size"><option value="full">真实显示器</option><option value="phone">手机比例</option></select></label>
+    <div id="sim-opts">
+      <h3>模拟的头</h3>
+      <label class="row"><span>延迟</span><span class="field"><input id="sim-lag" type="number" value="150" min="0" step="10"><em>ms</em></span></label>
+      <label class="row"><span>平滑 τ</span><span class="field"><input id="sim-tau" type="number" value="80" min="0" step="10"><em>ms</em></span></label>
+      <label class="row"><span>噪声</span><span class="field"><input id="sim-noise" type="number" value="0.2" min="0" step="0.05"><em>°</em></span></label>
+      <label class="row"><span>yaw 漂移</span><span class="field"><input id="sim-drift-yaw" type="number" value="0" step="0.5"><em>°/分</em></span></label>
+      <label class="row"><span>pitch 漂移</span><span class="field"><input id="sim-drift-pitch" type="number" value="0" step="0.5"><em>°/分</em></span></label>
+      <label class="row"><span>采样率</span><span class="field"><input id="sim-rate" type="number" value="50" min="1" max="200"><em>Hz</em></span></label>
+      <p class="note">模拟时，把鼠标移到 3D 里的屏幕上，机器人就会转头去看。</p>
+    </div>
+    <button class="btn ink wide" id="btn-export">导出全部记录</button>
+    <h3>快捷键</h3>
+    <p class="keys"><kbd>C</kbd> 重新居中　<kbd>空格</kbd> 离合　<kbd>Esc</kbd> 中止或交还鼠标　<kbd>[</kbd> <kbd>]</kbd> 模拟歪头</p>
+  </section>
+
+  <script type="module" src="ui/cover.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

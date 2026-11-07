@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key>
+  <string>io.github.nodlink.bridge</string>
+  <key>CFBundleName</key>
+  <string>NodLinkBridge</string>
+  <key>CFBundleDisplayName</key>
+  <string>NodLink 耳机桥</string>
+  <key>CFBundleExecutable</key>
+  <string>NodLinkBridge</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.1.0</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>14.0</string>
+  <key>LSUIElement</key>
+  <true/>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>NodLink 用麦克风听语音指令（左键、右键、上滑……），只在本机识别。</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>NodLink 把语音指令转成文字来匹配操作，优先在本机离线识别。</string>
+  <key>NSMotionUsageDescription</key>
+  <string>NodLink 需要读取 AirPods 的头部姿态，用来在调试台里显示头部朝向并控制光标。</string>
+</dict>
+</plist>

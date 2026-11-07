@@ -1,0 +1,19 @@
+{
+  "name": "nodlink-web",
+  "private": true,
+  "description": "NodLink 调试台：Mac 端中继服务与调试网页",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "fake-source": "node tools/fake-source.js",
+    "build:public": "node scripts/build-public.js",
+    "preview:public": "node scripts/build-public.js && NODLINK_ROOT=dist PORT=8790 node server.js"
+  },
+  "dependencies": {
+    "@fontsource-variable/sora": "^5.3.0",
+    "@fontsource-variable/unbounded": "^5.3.0",
+    "three": "^0.170.0",
+    "ws": "^8.18.0"
+  }
+}

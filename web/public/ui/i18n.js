@@ -114,6 +114,7 @@ const EN = {
   '游戏': 'Games',
   '奶蛙': 'Naiwa',
   '试一试': 'Try it',
+  'GitHub 仓库': 'GitHub repository',
   '传感器原始值 yaw {y} · pitch {p} · roll {r}（零点是耳机开始传数据时的朝向）': 'Raw sensor: yaw {y} · pitch {p} · roll {r} (zero = where the AirPods started streaming)',
   '点头': 'Nod',
   '抬头': 'Look up',

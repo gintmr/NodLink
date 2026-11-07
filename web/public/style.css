@@ -288,6 +288,10 @@ body[data-replay] .probe { border-color: var(--wave); }
 }
 .round:active { transform: scale(.95); }
 .round[aria-expanded=true] { background: var(--solid); color: var(--on-solid); }
+/* GitHub 入口是链接不是按钮：去掉链接样式；图标是实心的，不走描边 */
+.gh-btn { color: inherit; text-decoration: none; }
+.gh-btn svg { fill: currentColor; stroke: none; }
+.gh-btn:hover { background: var(--solid); color: var(--on-solid); }
 
 .first-hint {
   position: fixed;

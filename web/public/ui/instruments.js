@@ -166,8 +166,9 @@ export class Instruments {
   /** 切换语言后调一次 */
   relabel() {
     const en = getLang() === 'en';
-    this.labelL.textContent = en ? 'LEFT' : '左键';
-    this.labelR.textContent = en ? 'RIGHT' : '右键';
+    // 英文只写 L / R：和“左键 / 右键”一样宽，表盘框不用随语言变
+    this.labelL.textContent = en ? 'L' : '左键';
+    this.labelR.textContent = en ? 'R' : '右键';
   }
 
   /**

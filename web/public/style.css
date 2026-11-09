@@ -674,11 +674,17 @@ body.inpage-run .stage-wrap, .stage-wrap:fullscreen { display: flex; }
 
 /* ---------- 窄屏：卡片变成底部抽屉 ---------- */
 
-@media (max-width: 1320px) {
+/* 顶栏各控件定宽（见文件末尾“换语言不动布局”），一排至少要约 1530px；公开版多一个“用真耳机”，约 1670px */
+@media (max-width: 1540px) {
   /* 放不下时换到第二行，但仍是居中的一枚胶囊，不拉成长条 */
   .top { flex-wrap: wrap; }
   .top-start, .top-end { flex: 0 1 auto; }
   .timeline { order: 3; flex: 0 1 440px; margin: 0 auto; }
+}
+@media (max-width: 1680px) {
+  :root[data-edition="public"] .top { flex-wrap: wrap; }
+  :root[data-edition="public"] .top-start, :root[data-edition="public"] .top-end { flex: 0 1 auto; }
+  :root[data-edition="public"] .timeline { order: 3; flex: 0 1 440px; margin: 0 auto; }
 }
 
 @media (max-width: 720px) {
@@ -1488,3 +1494,32 @@ body.has-callout .inst-pitch { opacity: 0; }
 :root:not([data-edition="public"]) .public-only { display: none !important; }
 #edition-link { gap: 6px; text-decoration: none; }
 #edition-link svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- 换语言不动布局 ----------
+   英文用 Unbounded，同样的意思比中文宽两三倍。顶栏、左下运行数据都按英文放得下的宽度定死，中英文共用一套尺寸，
+   切语言时每块面板的位置和大小都不变；英文在顶栏里小一号。耳机状态这类会变长的文字放不下就用省略号 */
+:lang(en) .top .pills span, :lang(en) .panel-tabs button, :lang(en) .pods-chip, :lang(en) .live-btn { font-size: 11.5px; }
+.top-start .pills span { width: 98px; padding: 0 3px; }
+.pills:has(input[name=lang]) span, .pills:has(input[name=cover-lang]) span { width: 50px; padding: 0; }
+.live-btn { width: 64px; justify-content: center; padding: 0 6px; }
+#pods-chip { width: 118px; padding: 0 12px; }
+#pods-chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#edition-link { width: 140px; justify-content: center; padding: 0 8px; }
+.panel-tabs button { padding: 0 3px; }
+.panel-tabs button[data-panel=calib] { width: 76px; }
+.panel-tabs button[data-panel=cursor] { width: 58px; }
+.panel-tabs button[data-panel=actions] { width: 66px; }
+.arcade-entry { width: 98px; justify-content: center; padding: 0 6px; }
+@media (max-width: 1720px) { .arcade-entry { width: 40px; padding: 0; } }
+/* 公开版多一个“用真耳机”，三个玩的入口更早收成图标 */
+@media (max-width: 1860px) {
+  :root[data-edition="public"] .arcade-entry { width: 40px; gap: 0; padding: 0; }
+  :root[data-edition="public"] .arcade-entry span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+/* 运行数据：定宽两列，底下一行说明固定占两行高（中文一行半、英文两行都装得下），所以高度也不随语言变 */
+.hud-stats { width: 300px; grid-template-columns: 1fr 1fr; }
+.hud-foot { height: calc(2 * 1.3em + 8px); white-space: normal; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+@media (max-width: 1180px) {
+  .hud-stats { width: 178px; grid-template-columns: 1fr; }
+  .hud-foot { max-width: none; height: calc(3 * 1.3em + 8px); -webkit-line-clamp: 3; }
+}
